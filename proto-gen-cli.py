@@ -16,7 +16,8 @@ args = parser.parse_args()
 
 
 class ProtoGeneratorClient:
-    SERVER_URL = 'http://127.0.0.1:5000/'
+    SERVER_URL = 'http://127.0.0.1:5000'
+    GENERATE_API_URL = SERVER_URL + '/generate'
     colors = Colors()
     language_map = {
         'js': True,
@@ -48,12 +49,22 @@ class ProtoGeneratorClient:
         try:
             requests.get(self.SERVER_URL)
             self.colors.print_green(f'The server is up!')
+            healthy = True
         except requests.exceptions.ConnectionError:
             self.colors.print_red(f'The server at {self.SERVER_URL} is down.')
         return healthy
 
     def call_generate_api(self):
-        pass
+        self.colors.print_purple('Uploading file to server...')
+        healthy = False
+        try:
+            with open(self.full_proto_path, 'rb') as f:
+                requests.post(self.GENERATE_API_URL,
+                              files={self.proto_path: f})
+            self.colors.print_green(f'Done!')
+        except requests.exceptions.ConnectionError:
+            self.colors.print_red(f'The server at {self.SERVER_URL} is down.')
+        return healthy
 
     def handle_proto_generation(self):
         self.colors.print_blue('Welcome to the gRPC proto code generator!')
