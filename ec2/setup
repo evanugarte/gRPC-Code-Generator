@@ -1,0 +1,41 @@
+#!/bin/bash
+
+function install_npm() {
+    curl -o- \
+    https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
+}
+
+function install_grpc_npm () {
+    npm install -g protoc-gen-grpc
+}
+
+function install_grpc_pip () {
+    python3 -m pip install grpcio
+}
+
+function check_if_command_installed() {
+    if ! command -v $1 &> /dev/null
+    then
+        echo "$1 could not be found"
+        return 1
+    else
+        echo "$1 is a command"
+        return 0
+    fi
+}
+
+declare -A commands=(
+    ["npm"]=install_npm
+    ["protoc-gen-grpc"]=install_grpc_npm
+    ["python3 -m grpc_tools.protoc"]=install_grpc_pip
+)
+
+for i in "${!commands[@]}"
+do
+    current_command=$i
+    install_function=${commands[$i]}
+    check_if_command_installed $current_command
+    if [ "$?" = 1 ]; then
+        $install_function
+    fi
+done
