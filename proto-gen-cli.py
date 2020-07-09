@@ -1,6 +1,7 @@
 from tools.colors import Colors
 from argparse import ArgumentParser
 import os
+import requests
 
 parser = ArgumentParser()
 
@@ -15,6 +16,7 @@ args = parser.parse_args()
 
 
 class ProtoGeneratorClient:
+    SERVER_URL = 'http://127.0.0.1:5000/'
     colors = Colors()
     language_map = {
         'js': True,
@@ -40,10 +42,25 @@ class ProtoGeneratorClient:
                 self.print_supported_languages(language)
         self.colors.print_green('The given languages are supported!')
 
+    def check_server_health(self):
+        self.colors.print_purple('Checking if server is up...')
+        healthy = False
+        try:
+            requests.get(self.SERVER_URL)
+            self.colors.print_green(f'The server is up!')
+        except requests.exceptions.ConnectionError:
+            self.colors.print_red(f'The server at {self.SERVER_URL} is down.')
+        return healthy
+
+    def call_generate_api(self):
+        pass
+
     def handle_proto_generation(self):
         self.colors.print_blue('Welcome to the gRPC proto code generator!')
         self.check_file_path()
         self.check_language_types()
+        if self.check_server_health():
+            self.call_generate_api()
 
     def print_supported_languages(self, unsupported_type):
         supported_types = ', '.join(
