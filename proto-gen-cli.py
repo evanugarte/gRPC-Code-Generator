@@ -14,7 +14,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 
-class ProtoFileGenerator:
+class ProtoGeneratorClient:
     colors = Colors()
     language_map = {
         'js': True,
@@ -22,17 +22,28 @@ class ProtoFileGenerator:
     }
 
     def __init__(self, proto_path, language_types):
-        self.colors.print_blue('Welcome to the gRPC proto code generator!')
+        self.proto_path = proto_path
+        self.full_proto_path = os.path.join(os.getcwd(), proto_path)
+        self.language_types = language_types
+
+    def check_file_path(self):
         self.colors.print_purple('Checking file path...')
-        self.proto_path = os.path.join(os.getcwd(), proto_path)
-        if not os.path.isfile(self.proto_path):
-            raise FileNotFoundError(f'The path {proto_path} could not be resolved.')
+        if not os.path.isfile(self.full_proto_path):
+            raise FileNotFoundError(
+                f'The path {self.proto_path} could not be resolved.')
         self.colors.print_green('File found!')
+
+    def check_language_types(self):
         self.colors.print_purple('Checking supplied language type...')
-        for language in language_types:
+        for language in self.language_types:
             if language not in self.language_map:
                 self.print_supported_languages(language)
         self.colors.print_green('The given languages are supported!')
+
+    def handle_proto_generation(self):
+        self.colors.print_blue('Welcome to the gRPC proto code generator!')
+        self.check_file_path()
+        self.check_language_types()
 
     def print_supported_languages(self, unsupported_type):
         supported_types = ', '.join(
@@ -43,4 +54,5 @@ class ProtoFileGenerator:
 
 
 if __name__ == "__main__":
-    generator = ProtoFileGenerator(args.proto_path[0], args.language)
+    generator = ProtoGeneratorClient(args.proto_path[0], args.language)
+    generator.handle_proto_generation()
