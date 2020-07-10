@@ -58,9 +58,11 @@ class ProtoGeneratorClient:
         self.colors.print_purple('Uploading file to server...')
         healthy = False
         try:
+            params = dict((key, True) for key in self.language_types)
             with open(self.full_proto_path, 'rb') as f:
                 requests.post(self.GENERATE_API_URL,
-                              files={self.proto_path: f})
+                              files={self.proto_path: f},
+                              params=params)
             self.colors.print_green(f'Done!')
         except requests.exceptions.ConnectionError:
             self.colors.print_red(f'The server at {self.SERVER_URL} is down.')

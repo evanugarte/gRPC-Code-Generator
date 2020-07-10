@@ -16,7 +16,7 @@ def handle_health_check():
 def generate_grpc_code():
     file_name = list(request.files.keys())[0]
     proto_file = request.files[file_name]
-    generator = ProtoFileGenerator(proto_file, request.data)
+    generator = ProtoFileGenerator(proto_file, request.args)
     generator.handle_proto_generation()
     # return s3 back to user
     return 'Hello I work!'
