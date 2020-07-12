@@ -56,24 +56,31 @@ class ProtoGeneratorClient:
 
     def call_generate_api(self):
         self.colors.print_purple('Uploading file to server...')
-        healthy = False
+        response = False
         try:
             params = dict((key, True) for key in self.language_types)
             with open(self.full_proto_path, 'rb') as f:
-                requests.post(self.GENERATE_API_URL,
-                              files={self.proto_path: f},
-                              params=params)
+                response = requests.post(self.GENERATE_API_URL,
+                                         files={self.proto_path: f},
+                                         params=params)
             self.colors.print_green(f'Done!')
         except requests.exceptions.ConnectionError:
             self.colors.print_red(f'The server at {self.SERVER_URL} is down.')
-        return healthy
+        return response
+
+    def print_file_urls(self, file_dict):
+        self.colors.print_blue('Your files have been sucessfully generated!\n')
+        for file_name in file_dict.keys():
+            self.colors.print_green(file_name + ':')
+            self.colors.print_pink(file_dict[file_name] + '\n')
 
     def handle_proto_generation(self):
         self.colors.print_blue('Welcome to the gRPC proto code generator!')
         self.check_file_path()
         self.check_language_types()
         if self.check_server_health():
-            self.call_generate_api()
+            response = self.call_generate_api()
+            self.print_file_urls(response.json())
 
     def print_supported_languages(self, unsupported_type):
         supported_types = ', '.join(
