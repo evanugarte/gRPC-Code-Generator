@@ -2,6 +2,7 @@ import os
 from os import path
 import uuid
 import shutil
+from s3_handler import S3Handler
 import time
 
 
@@ -10,12 +11,14 @@ class ProtoFileGenerator():
     uuid_directory = None
     original_directory = None
     language_types = None
+    s3_handler = None
 
     def __init__(self, proto_file, language_types):
         self.proto_file = proto_file
         self.uuid_directory = str(uuid.uuid4())
         self.original_directory = os.getcwd()
         self.language_types = language_types
+        self.s3_handler = S3Handler()
         self.generator_dict = {
             'js': self.generate_node_files,
             'py': self.generate_python_files
@@ -41,11 +44,13 @@ class ProtoFileGenerator():
 
     def remove_uuid_directory(self):
         os.chdir(self.original_directory)
-        time.sleep(5)
         shutil.rmtree(self.uuid_directory, ignore_errors=True)
 
     def handle_s3_upload(self):
-        pass
+        for file in os.listdir('.'):
+            if not file.endswith('.proto'):
+                self.s3_handler.upload_file(file, self.uuid_directory)
+        return self.s3_handler.get_file_urls(self.uuid_directory)
 
     def generate_specified_language_code(self):
         for language_type in self.language_types.keys():
@@ -55,7 +60,6 @@ class ProtoFileGenerator():
     def handle_proto_generation(self):
         self.create_uuid_directory()
         self.generate_specified_language_code()
-        # upload files to s3
-        # grab the links
+        files = self.handle_s3_upload()
         self.remove_uuid_directory()
-        # return the links to the user
+        return files
