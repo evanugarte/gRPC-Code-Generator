@@ -1,16 +1,22 @@
 #!/bin/bash
 
 function install_npm() {
-    curl -o- \
-    https://raw.githubusercontent.com/creationix/nvm/v0.33.1/install.sh | bash
+    curl -sL https://deb.nodesource.com/setup_12.x | /bin/bash -
+    yes | apt-get install nodejs
 }
 
 function install_grpc_npm () {
+    npm install -g request
+    npm config set unsafe-perm true
     npm install -g protoc-gen-grpc
 }
 
 function install_grpc_pip () {
     python3 -m pip install grpcio
+}
+
+function install_pip_dependencies() {
+    python3 -m pip install -r requirements.txt
 }
 
 function check_if_command_installed() {
@@ -34,8 +40,10 @@ for i in "${!commands[@]}"
 do
     current_command=$i
     install_function=${commands[$i]}
-    check_if_command_installed $current_command
+    check_if_command_installed "$current_command"
     if [ "$?" = 1 ]; then
         $install_function
     fi
 done
+
+install_pip_dependencies

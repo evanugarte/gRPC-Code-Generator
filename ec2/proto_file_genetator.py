@@ -3,7 +3,6 @@ from os import path
 import uuid
 import shutil
 from s3_handler import S3Handler
-import time
 
 
 class ProtoFileGenerator():
