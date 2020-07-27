@@ -86,6 +86,9 @@ def generate_python_files(self):
 </CORSConfiguration>
 ```
 
+### `requirements.txt`:
+See [`ec2/requirements.txt`](https://github.com/evanugarte/gRPC-Code-Generator/blob/master/ec2/requirements.txt)
+
 ### Docker Container Setup Script:
 You can find it in [`ec2/setup`](https://github.com/evanugarte/gRPC-Code-Generator/blob/master/ec2/setup)
 
